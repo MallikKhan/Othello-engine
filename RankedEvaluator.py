@@ -11,7 +11,7 @@ class RankedEvaluator(OthelloEvaluator):
             for item in othello_position.board:
                 x+=1
                 point = 0
-                if (x == 1 and (y in §1)) or (x == 8 and (y == 1 or y == 8))
+                if (x == 1 and (y in [1, 8])) or (x == 8 and (y == [1, 8]))
                     point = 10 #position is a corner
                 elif (x == 1) or (x == 8) or (y == 1) or (y == 8) 
                     point = 4 #Position is a edge
