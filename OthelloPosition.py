@@ -58,6 +58,16 @@ class OthelloPosition(object):
         :return: The OthelloPosition resulting from making the move action in the current position.
         """
         # TODO: write the code for this method and whatever helper methods it need
+        if action.is_pass_move:
+            self.maxPlayer = not self.maxPlayer
+        elif self.maxPlayer:
+            self.board[action.row][action.col] = 'W'
+            self.maxPlayer = False
+        else:
+            self.board[action.row][action.col] = 'B'
+            self.maxPlayer = True
+        
+        return self
 
     def get_moves(self):
         """
