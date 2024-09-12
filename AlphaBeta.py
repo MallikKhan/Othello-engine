@@ -27,4 +27,13 @@ def set_search_depth(self, depth):
 
 
 def evaluate(self, othello_position):
-    # TODO: implement the alpha-beta algorithm
+    depth = 0 #temporary
+    if depth == 5:
+        return #Best final OthelloAction
+
+    if othello_position.maxPlayer == True:
+        #do something
+    
+    if othello_position.maxPlayer == False:
+        #do something
+
