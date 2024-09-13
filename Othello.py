@@ -18,7 +18,7 @@ def main(position, time_limit):
         action = ab_pruning.evaluate(game)
         i += 1
     print(f"got to depth {i}, best move is:")
-    action.print_move();
+    action.print_move()
 
 
 if __name__ == "__main__":
