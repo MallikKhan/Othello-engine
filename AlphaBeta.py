@@ -26,14 +26,45 @@ def set_search_depth(self, depth):
     self.search_depth = depth  # use iterative deepening search to decide depth
 
 
+"""
+    Returns the OthelloAction the algorithm considers to be the best move given an OthelloPosition
+    :param othello_position: The OthelloPosition to evaluate
+    :return: The move to make as an OthelloAction
+ """
 def evaluate(self, othello_position):
-    depth = 0 #temporary
-    if depth == 5:
-        return #Best final OthelloAction
+    alpha_beta_algorithm(othello_position, self.search_depth, float('-inf'), float('inf'), othello_position.to_move())
+    #return Othelloaction
 
-    if othello_position.maxPlayer == True:
-        #do something
+def alpha_beta_algorithm(self, position, depth, alpha_value, beta_value, maximizingPlayer):
+    if depth == 0:
+        return self.evaluator(position)
     
-    if othello_position.maxPlayer == False:
-        #do something
+    if maximizingPlayer:
+        max_value = float('-inf')
+        list = position.get_moves()
+        for item in list: #each child in the list save the smallest number
+            value = alpha_beta_algorithm(item, depth - 1, alpha_value, beta_value, maximizingPlayer)
+            if value > max_value:
+                max_value = value
+            if value > alpha_value:
+                alpha_value = value
+            if beta_value <= alpha_value:
+                break
+        return max_value
+    else:
+        min_value = float('inf')
+        list = position.get_moves()
+        for item in list: #each child in the list save the smallest number
+            value = alpha_beta_algorithm(item, depth - 1, alpha_value, beta_value, maximizingPlayer)
+            if value > max_value:
+                max_value = value
+            if value < beta_value:
+                beta_value = value
+            if beta_value <= alpha_value:
+                break
+        return min_value
+
+             
+
+    
 
