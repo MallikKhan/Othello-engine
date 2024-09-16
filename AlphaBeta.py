@@ -41,29 +41,26 @@ def alpha_beta_algorithm(self, position, depth, alpha_value, beta_value, maximiz
     
     if maximizingPlayer:
         max_value = float('-inf')
-        list = position.get_moves()
-        for item in list: #each child in the list save the smallest number
-            value = alpha_beta_algorithm(item, depth - 1, alpha_value, beta_value, maximizingPlayer)
-            if value > max_value:
-                max_value = value
-            if value > alpha_value:
-                alpha_value = value
+        list_ = position.get_moves()
+        for item in list_: #each child in the list save the smallest number
+            pos = position.make_move(item, item.is_pass_move)
+            value = alpha_beta_algorithm(pos, depth - 1, alpha_value, beta_value, maximizingPlayer)
+            max_value = max(max_value, value)
+            alpha_value = max(alpha_value, value)
             if beta_value <= alpha_value:
                 break
         return max_value
     else:
         min_value = float('inf')
-        list = position.get_moves()
-        for item in list: #each child in the list save the smallest number
-            value = alpha_beta_algorithm(item, depth - 1, alpha_value, beta_value, maximizingPlayer)
-            if value > max_value:
-                max_value = value
-            if value < beta_value:
-                beta_value = value
+        list_ = position.get_moves()
+        for item in list_: #each child in the list save the smallest number
+            pos = position.make_move(item, item.is_pass_move)
+            value = alpha_beta_algorithm(pos, depth - 1, alpha_value, beta_value, maximizingPlayer)
+            max_value = min(max_value, value)
+            beta_value = min(beta_value, value)
             if beta_value <= alpha_value:
                 break
         return min_value
-
              
 
     
