@@ -32,8 +32,16 @@ def set_search_depth(self, depth):
     :return: The move to make as an OthelloAction
  """
 def evaluate(self, othello_position):
-    alpha_beta_algorithm(othello_position, self.search_depth, float('-inf'), float('inf'), othello_position.to_move())
-    #return Othelloaction
+    list_ = othello_position.get_moves()
+    value = float('-inf');
+    ret = None
+    for move in list_:
+        temp = alpha_beta_algorithm(move, self.search_depth -1, float('-inf'), float('inf'), othello_position.to_move())
+        if (temp > value):
+            value = temp
+            ret = move
+        value = max(temp, value)
+    return ret
 
 def alpha_beta_algorithm(self, position, depth, alpha_value, beta_value, maximizingPlayer):
     if depth == 0:
