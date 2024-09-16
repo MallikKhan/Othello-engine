@@ -8,7 +8,7 @@ class RankedEvaluator(OthelloEvaluator):
         y = 0
         for row in othello_position.board:
             y+=1
-            for item in othello_position.board:
+            for item in row:
                 x+=1
                 point = 0
                 if (x == 1 and (y in [1, 8])) or (x == 8 and (y == [1, 8])):

@@ -6,14 +6,14 @@ import argparse
 import time
 
 def main(position, time_limit):
-    if position == "":
-        return
     game = OthelloPosition(position)
+    if position == "":
+        game.initialize()
     start_time = time.time()
     action = OthelloAction(0,0)
     i = 0
-    ab_pruning = AlphaBeta(RankedEvaluator())
-    while (time.time() - start_time) < time_limit:
+    ab_pruning = AlphaBeta()
+    while ((time.time() - start_time) < time_limit) and not i > 10:
         ab_pruning.set_search_depth(i)
         action = ab_pruning.evaluate(game)
         i += 1
