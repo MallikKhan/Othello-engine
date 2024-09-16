@@ -34,41 +34,50 @@ class AlphaBeta(OthelloAlgorithm):
     def evaluate(self, othello_position):
         action = OthelloAction(0,0, True)
         [max_val, ret] = self.alpha_beta_algorithm(othello_position, action, self.DefaultDepth, float('-inf'), float('inf'), othello_position.to_move())
-        print(f"maxinum:  {max_val}, move:")
+        print(f"\nmaxinum:  {max_val}, move:")
         ret.print_move()
         return ret
 
     def alpha_beta_algorithm(self, position, action, depth, alpha_value, beta_value, maximizingPlayer):
         if depth == 0:
+            print(f"\Value:  {self.evaluator.evaluate(position)}, move:")
+            action.print_move()
             return (self.evaluator.evaluate(position), action)
         
         if maximizingPlayer:
+            #print("White to move")
             max_value = float('-inf')
             list_ = position.get_moves()
+            print(list_)
             a = action
             for item in list_: #each child in the list save the smallest number
                 pos = position.make_move(item)
-                [value, act] = self.alpha_beta_algorithm(pos, item, depth - 1, alpha_value, beta_value, maximizingPlayer)
-                if (max_value < value):
+                
+                [value, act] = self.alpha_beta_algorithm(pos, item, depth - 1, alpha_value, beta_value, pos.to_move())
+                if (alpha_value < value):
                     a = act
                 max_value = max(max_value, value)
                 alpha_value = max(alpha_value, value)
                 if beta_value <= alpha_value:
                     break
+            
+            a.print_move()
             return (max_value, a)
         else:
+            print("Black to move")
             min_value = float('inf')
             list_ = position.get_moves()
             a = action
             for item in list_: #each child in the list save the smallest number
                 pos = position.make_move(item)
-                [value, act] = self.alpha_beta_algorithm(pos, item, depth - 1, alpha_value, beta_value, maximizingPlayer)
-                if (max_value > value):
+                [value, act] = self.alpha_beta_algorithm(pos, item, depth - 1, alpha_value, beta_value, pos.to_move())
+                if (beta_value > value):
                     a = act
                 max_value = min(max_value, value)
                 beta_value = min(beta_value, value)
                 if beta_value <= alpha_value:
                     break
+            a.print_move()
             return (min_value, a)
                 
 
