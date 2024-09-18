@@ -58,48 +58,50 @@ class OthelloPosition(object):
         :return: The OthelloPosition resulting from making the move action in the current position.
         """
         # TODO: write the code for this method and whatever helper methods it need
+        
         if action.is_pass_move:
             self.maxPlayer = not self.maxPlayer
         elif self.maxPlayer:
             self.board[action.row][action.col] = 'W'
             self.maxPlayer = False
+            self.flip_stones(action, 'W')
         else:
             self.board[action.row][action.col] = 'B'
             self.maxPlayer = True
-        
+            self.flip_stones(action, 'B')
+
         return self
-
-    def flip_stone(self, action):
-        stone = 'E'
-        #check north
+    
+    def flip(self, action):
         if self.board[action.row][action.col] == 'W':
-            stone = 'B'
+            self.board[action.row][action.col] = 'B'
         else:
-            stone = 'W'
+            self.board[action.row][action.col] = 'W'
 
-        i = 1
-        while True:
-            if self.board[action.row + i][action.col - i] == stone:
-                
-            if self.board[action.row - i][action.col + i] == stone:
 
-            if self.board[action.row + i][action.col] == stone:
+    def flip_stones(self, action, player):
+        opponent = 'W' if player == 'B' else 'B'
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1),  # Up, Down, Left, Right
+                      (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Diagonals
 
-            if self.board[action.row + i][action.col + i] == stone:
+        for direction in directions:
+            row, col = action.row + direction[0], action.col + direction[1]
+            stones_to_flip = []
 
-            if self.board[action.row][action.col + i] == stone:
+            while self.is_inbound(row, col) and self.board[row][col] == opponent:
+                stones_to_flip.append(OthelloAction(row, col))
+                row += direction[0]
+                col += direction[1]
 
-            if self.board[action.row - i][action.col] == stone:
-
-            if self.board[action.row - i][action.col - i] == stone:
-
-            if self.board[action.row][action.col - i] == stone:
-                
-
-            i += 1
-
-            
-
+            # If we find a player's own stone after opponent's stones, we can flip them
+            if self.is_inbound(row, col) and self.board[row][col] == player:
+                if len(stones_to_flip) > 0:
+                    for a in stones_to_flip:
+                        self.flip(a)
+        
+    
+    def is_inbound(self, row, col):
+        return 0 <= row < self.BOARD_SIZE and 0 <= col < self.BOARD_SIZE
 
 
     def get_moves(self):
