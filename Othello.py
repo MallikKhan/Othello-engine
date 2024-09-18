@@ -13,14 +13,15 @@ def main(position, time_limit):
     action = OthelloAction(0,0)
     i = 0
     ab_pruning = AlphaBeta()
-    while ((time.time() - start_time) < time_limit) and not i > 3:
-        print(f"i: {i}")
+    game.print_board()
+    while ((time.time() - start_time) < time_limit):
         ab_pruning.set_search_depth(i)
-        action = ab_pruning.evaluate(game)
+        action = ab_pruning.evaluate(game.clone())
         i += 1
-        print("\n\n")
     print(f"got to depth {i}, best move is:")
+    game.make_move(action)
     action.print_move()
+    game.print_board()
 
 
 if __name__ == "__main__":
