@@ -69,6 +69,39 @@ class OthelloPosition(object):
         
         return self
 
+    def flip_stone(self, action):
+        stone = 'E'
+        #check north
+        if self.board[action.row][action.col] == 'W':
+            stone = 'B'
+        else:
+            stone = 'W'
+
+        i = 1
+        while True:
+            if self.board[action.row + i][action.col - i] == stone:
+                
+            if self.board[action.row - i][action.col + i] == stone:
+
+            if self.board[action.row + i][action.col] == stone:
+
+            if self.board[action.row + i][action.col + i] == stone:
+
+            if self.board[action.row][action.col + i] == stone:
+
+            if self.board[action.row - i][action.col] == stone:
+
+            if self.board[action.row - i][action.col - i] == stone:
+
+            if self.board[action.row][action.col - i] == stone:
+                
+
+            i += 1
+
+            
+
+
+
     def get_moves(self):
         """
         Get all possible moves for the current position
