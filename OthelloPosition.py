@@ -58,19 +58,19 @@ class OthelloPosition(object):
         :return: The OthelloPosition resulting from making the move action in the current position.
         """
         # TODO: write the code for this method and whatever helper methods it need
-        
+        ret = self.clone()
         if action.is_pass_move:
-            self.maxPlayer = not self.maxPlayer
+            ret.maxPlayer = not self.maxPlayer
         elif self.maxPlayer:
-            self.board[action.row][action.col] = 'W'
-            self.maxPlayer = False
-            self.flip_stones(action, 'W')
+            ret.board[action.row][action.col] = 'W'
+            ret.maxPlayer = False
+            ret.flip_stones(action, 'W')
         else:
-            self.board[action.row][action.col] = 'B'
-            self.maxPlayer = True
-            self.flip_stones(action, 'B')
+            ret.board[action.row][action.col] = 'B'
+            ret.maxPlayer = True
+            ret.flip_stones(action, 'B')
 
-        return self
+        return ret
     
     def flip(self, action):
         if self.board[action.row][action.col] == 'W':

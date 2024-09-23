@@ -12,7 +12,7 @@ def main(position, time_limit):
     start_time = time.time()
     action = OthelloAction(0,0)
     i = 0
-    ab_pruning = AlphaBeta()
+    ab_pruning = AlphaBeta(RankedEvaluator())
     while ((time.time() - start_time) < time_limit):
         ab_pruning.set_search_depth(i)
         action = ab_pruning.evaluate(game.clone())

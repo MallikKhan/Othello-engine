@@ -4,24 +4,27 @@ class RankedEvaluator(OthelloEvaluator):
     def evaluate(self, othello_position):
         black_squares = 0
         white_squares = 0
-        x = 0
-        y = 0
-        for row in othello_position.board:
-            y+=1
-            for item in row:
-                x+=1
-                point = 0
-                if (x == 1 and (y in [1, 8])) or (x == 8 and (y == [1, 8])):
-                    point = 10 #position is a corner
-                elif (x == 1) or (x == 8) or (y == 1) or (y == 8):
-                    point = 4 #Position is a edge
-                elif ((x == 3 or x == 6) and (y == 3 or y == 6)):
-                    point = 3 #Position is center corner
-                elif ((x in [3,6]) and (y in [4, 5])) or ((y in [3,6]) and (y in [4,5])):
-                    point = 2 #Position is a phase one position
+        
+        # Position weights based on board importance
+        position_weights = [
+            [10, -2,  4,  4,  4,  4, -2, 10],  # row 1 (corners + edges)
+            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 2 (adjacent to corners, bad)
+            [ 4, -1,  2,  2,  2,  2, -1,  4],  # row 3 (inner squares)
+            [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 4 (middle area)
+            [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 5 (middle area)
+            [ 4, -1,  2,  2,  2,  2, -1,  4],  # row 6 (inner squares)
+            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 7 (adjacent to corners, bad)
+            [10, -2,  4,  4,  4,  4, -2, 10]   # row 8 (corners + edges)
+        ]
+        for y in range(8):
+            for x in range(8):
+                point = position_weights[y][x]
+                item = othello_position.board[y][x]  # Board is zero-indexed
                 
                 if item == "W":
                     white_squares += point
-                if item == "B":
+                elif item == "B":
                     black_squares += point
+
+        # The heuristic returns the difference in scores (favoring the current player)
         return white_squares - black_squares
