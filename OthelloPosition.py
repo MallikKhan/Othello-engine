@@ -371,8 +371,28 @@ class OthelloPosition(object):
 
     def print_board(self):
         """
-        Prints the current board. Do not use when running othellostart (it will crash)
+        Prints the current board with column and row labels in the desired format.
         :return: Nothing
         """
-        print(self.board)
+        # Column headers
+        print("   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |")
+        print("---|---|---|---|---|---|---|---|---|---")
+
+        for row_idx, row in enumerate(self.board, start=-1):
+            # Row number before the cells
+            print(f" {row_idx} |", end="")
+            for item in row:
+                if item == 'E':
+                    print("   |", end="")
+                elif item == 'B':
+                    print(" X |", end="")
+                else:
+                    print(" O |", end="")
+            # Row number after the cells
+            print(f" {row_idx}")
+            print("---|---|---|---|---|---|---|---|---|---")
+
+        # Column headers at the bottom
+        print("   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |")
+
         # print("ToMove: ", self.maxPlayer)

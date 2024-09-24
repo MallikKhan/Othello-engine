@@ -12,6 +12,8 @@ class AlphaBeta(OthelloAlgorithm):
     Author:
     """
     DefaultDepth = 5
+    PosInfty = float('inf')
+    NegInfty = float('-inf')
 
 
     def __init__(self, othello_evaluator=CountingEvaluator(), depth=DefaultDepth):
@@ -33,62 +35,71 @@ class AlphaBeta(OthelloAlgorithm):
     """
     def evaluate(self, othello_position):
         if othello_position.to_move():
-            action = self.maximizing(othello_position, self.search_depth, float('-inf'), float('inf'))
+            action = self.evaluate_max(othello_position, self.search_depth, float('-inf'), float('inf'))
             return action
         else: 
-            action = self.minimizing(othello_position, self.search_depth, float('-inf'), float('inf'))
+            action = self.evaluate_min(othello_position, self.search_depth, float('-inf'), float('inf'))
             return action
 
-    def maximizing(self, position, depth, alpha, beta):
-        value = float('-inf')
+   
+    def evaluate_max(self, position, depth, alpha, beta):
+        max_value = self.NegInfty
+        moves = position.get_moves()
+
         if depth == 0:
             action = OthelloAction(0, 0)
             action.value = self.evaluator.evaluate(position)
             return action
-        
-        children = position.get_moves()
-        if len(children) == 0:
-            pass_move = OthelloAction(0, 0, True)
-            pass_position = position.make_move(pass_move)
-            pass_move.value = self.evaluator.evaluate(pass_position)
-            return pass_move
-        
-        best_action = OthelloAction(0, 0)
-        for child in children:
-            child_position = position.make_move(child)
-            min_action = self.minimizing(child_position, depth-1, alpha, beta)
-            if value < min_action.value:
-                child.value = value = min_action.value
-                best_action = child
 
-            alpha = max(alpha, value)
-            if alpha >= beta:
-                break
+        if len(moves) == 0:
+            pass_move = OthelloAction(0, 0, True)
+            pass_move.value = self.evaluator.evaluate(position)
+            return pass_move
+
+        best_action = OthelloAction(0, 0)
+        for move in moves:
+            new_position = position.make_move(move)
+            min_action = self.evaluate_min(new_position, depth - 1, alpha, beta)
+            if max_value < min_action.value:
+                move.value = max_value = min_action.value
+                best_action = move
+
+            if max_value >= beta:
+                move.value = max_value
+                return move
+
+            if max_value > alpha:
+                alpha = max_value
 
         return best_action
-    
-    def minimizing(self, position, depth, alpha, beta):
-        value = float('-inf')
+
+    def evaluate_min(self, position, depth, alpha, beta):
+        min_value = self.PosInfty
+        moves = position.get_moves()
+
         if depth == 0:
             action = OthelloAction(0, 0)
             action.value = self.evaluator.evaluate(position)
             return action
-        
-        children = position.get_moves()
-        if len(children) == 0:
+
+        if len(moves) == 0:
             pass_move = OthelloAction(0, 0, True)
-            pass_position = position.make_move(pass_move)
-            pass_move.value = self.evaluator.evaluate(pass_position)
+            pass_move.value = self.evaluator.evaluate(position)
             return pass_move
-        
+
         best_action = OthelloAction(0, 0)
-        for child in children:
-            child_position = position.make_move(child)
-            max_action = self.maximizing(child_position, depth-1, alpha, beta)
-            if max_action.value < value:
-                child.value = value = max_action.value
-                best_action = max_action
-            beta = min(beta, value)
-            if alpha >= beta:
-                break
+        for move in moves:
+            new_position = position.make_move(move)
+            max_action = self.evaluate_max(new_position, depth - 1, alpha, beta)
+            if min_value > max_action.value:
+                move.value = min_value = max_action.value
+                best_action = move
+
+            if min_value <= alpha:
+                move.value = min_value
+                return move
+
+            if min_value < beta:
+                beta = min_value
+
         return best_action
