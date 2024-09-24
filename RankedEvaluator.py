@@ -8,8 +8,8 @@ class RankedEvaluator(OthelloEvaluator):
         
         # Position weights based on board importance
         position_weights = [
-            [10, -2,  4,  4,  4,  4, -2, 10],  # row 1 (corners + edges)
-            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 2 (adjacent to corners, bad)
+            [100, -20,  4,  4,  4,  4, -20, 100],  # row 1 (corners + edges)
+            [-20, -50, -1, -1, -1, -1, -50, -20],  # row 2 (adjacent to corners, bad)
             [ 4, -1,  2,  2,  2,  2, -1,  4],  # row 3 (inner squares)
             [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 4 (middle area)
             [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 5 (middle area)
