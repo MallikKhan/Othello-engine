@@ -5,18 +5,40 @@ class RankedEvaluator(OthelloEvaluator):
     def evaluate(self, othello_position):
         black_squares = 0
         white_squares = 0
+        phase = 0
+
+
+        for y in range(8):
+            for x in range(8):
+                item = othello_position.board[y][x]  # Board is zero-indexed
+                if item == "W" or "B":
+                    phase += 1
         
+        #Late game
         # Define positional weights matrix (corners, edges, center)
         position_weights = [
-            [10, -2,  4,  4,  4,  4, -2, 10],  # row 1 (corners + edges)
-            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 2 (adjacent to corners, bad)
+            [100, -20,  4,  4,  4,  4, -20, 100],  # row 1 (corners + edges)
+            [-20, -50, -1, -1, -1, -1, -50, -20],  # row 2 (adjacent to corners, bad)
             [ 4, -1,  2,  2,  2,  2, -1,  4],  # row 3 (inner squares)
             [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 4 (middle area)
             [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 5 (middle area)
             [ 4, -1,  2,  2,  2,  2, -1,  4],  # row 6 (inner squares)
-            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 7 (adjacent to corners, bad)
-            [10, -2,  4,  4,  4,  4, -2, 10]   # row 8 (corners + edges)
+            [-20, -50, -1, -1, -1, -1, -50, -20],  # row 7 (adjacent to corners, bad)
+            [100, -20,  4,  4,  4,  4, -20, 100]   # row 8 (corners + edges)
         ]
+
+        #Early game
+        if phase < 16:
+            position_weights = [
+                [100, -20,  4,  4,  4,  4, -20, 100],  # row 1 (corners + edges)
+                [-20, -50, -10, -10, -10, -10, -50, -20],  # row 2 (adjacent to corners, bad)
+                [ 4, -10,  20,  10,  10,  20, -10,  4],  # row 3 (inner squares)
+                [ 4, -10,  10,  1,  1,  10, -10,  4],  # row 4 (middle area)
+                [ 4, -10,  10,  1,  1,  10, -10,  4],  # row 5 (middle area)
+                [ 4, -10,  20,  10,  10,  20, -10,  4],  # row 6 (inner squares)
+                [-20, -50, -10, -10, -10, -10, -50, -20],  # row 7 (adjacent to corners, bad)
+                [100, -20,  4,  4,  4,  4, -20, 100]   # row 8 (corners + edges)
+            ]
         
         # Count discs for each player and evaluate positional value
         for y in range(8):
@@ -29,67 +51,23 @@ class RankedEvaluator(OthelloEvaluator):
                 elif item == "B":
                     black_squares += point
 
-        # Calculate mobility for both players
-        white_mobility = len(othello_position.get_moves())
-        black_mobility = len(othello_position.get_moves())
-        if (othello_position.to_move()):
-            pos = othello_position.make_move(OthelloAction(0, 0, True))
-            black_mobility = len(pos.get_moves())
-        else: 
-            pos = othello_position.make_move(OthelloAction(0, 0, True))
-            white_mobility = len(pos.get_moves())
 
 
-        # Frontier discs: count how many discs are adjacent to empty squares
-        white_frontier = self.count_frontier_discs(othello_position, "W")
-        black_frontier = self.count_frontier_discs(othello_position, "B")
+    
 
-        # Stability: count stable discs (discs that cannot be flipped)
-        white_stability = self.count_stable_discs(othello_position, "W")
-        black_stability = self.count_stable_discs(othello_position, "B")
+        if othello_position.to_move():
+            all_moves = othello_position.get_moves()
+            for item in all_moves:
+                x = item.row -1
+                y = item.col -1
+                white_squares += position_weights[y][x]
+        else:
+            all_moves = othello_position.get_moves()
+            for item in all_moves:
+                x = item.row -1
+                y = item.col -1
+                black_squares += position_weights[y][x]
 
-        # Combine the factors into the final heuristic value
-        positional_value = white_squares - black_squares
-        mobility_value = white_mobility - black_mobility
-        frontier_value = black_frontier - white_frontier  # Fewer frontier discs is better
-        stability_value = white_stability - black_stability
 
-        # Weighting the factors (you can tune these weights based on experimentation)
-        weight_positional = 10
-        weight_mobility = 5
-        weight_frontier = 3
-        weight_stability = 8
 
-        heuristic_value = (
-            weight_positional * positional_value +
-            weight_mobility * mobility_value +
-            weight_frontier * frontier_value +
-            weight_stability * stability_value
-        )
-
-        return heuristic_value
-
-    def count_frontier_discs(self, othello_position, player):
-        # Count the number of frontier discs for the given player
-        frontier_count = 0
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
-        for y in range(8):
-            for x in range(8):
-                if othello_position.board[y][x] == player:
-                    for dy, dx in directions:
-                        ny, nx = y + dy, x + dx
-                        if 0 <= ny < 8 and 0 <= nx < 8 and othello_position.board[ny][nx] == ".":
-                            frontier_count += 1
-                            break
-        return frontier_count
-
-    def count_stable_discs(self, othello_position, player):
-        # A simple method to count stable discs (discs that cannot be flipped)
-        stable_count = 0
-        # Simple check for corners (advanced stable-disc detection would be more complex)
-        stable_positions = [(0, 0), (0, 7), (7, 0), (7, 7)]  # Corners
-        for y, x in stable_positions:
-            if othello_position.board[y][x] == player:
-                stable_count += 1
-        # Advanced stable-disc detection can be added here based on edge-stability algorithms
-        return stable_count
+        return white_squares - black_squares
