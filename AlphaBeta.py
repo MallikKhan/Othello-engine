@@ -64,12 +64,12 @@ class AlphaBeta(OthelloAlgorithm):
                 move.value = max_value = min_action.value
                 best_action = move
 
-            if max_value >= beta:
-                move.value = max_value
-                return move
-
             if max_value > alpha:
                 alpha = max_value
+
+            if alpha >= beta:
+                break
+
 
         return best_action
 
@@ -95,11 +95,10 @@ class AlphaBeta(OthelloAlgorithm):
                 move.value = min_value = max_action.value
                 best_action = move
 
-            if min_value <= alpha:
-                move.value = min_value
-                return move
-
             if min_value < beta:
                 beta = min_value
+
+            if alpha >= beta:
+                break
 
         return best_action
