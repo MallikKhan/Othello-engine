@@ -2,6 +2,7 @@ from OthelloAlgorithm import OthelloAlgorithm
 from CountingEvaluator import CountingEvaluator
 from RankedEvaluator import RankedEvaluator
 from OthelloAction import OthelloAction
+import time
 
 
 class AlphaBeta(OthelloAlgorithm):
@@ -12,9 +13,8 @@ class AlphaBeta(OthelloAlgorithm):
     Author:
     """
     DefaultDepth = 5
-    PosInfty = float('inf')
-    NegInfty = float('-inf')
-
+    time_limit = 0
+    start_time = 0
 
     def __init__(self, othello_evaluator=CountingEvaluator(), depth=DefaultDepth):
         self.evaluator = othello_evaluator
@@ -26,6 +26,10 @@ class AlphaBeta(OthelloAlgorithm):
 
     def set_search_depth(self, depth):
         self.search_depth = depth  # use iterative deepening search to decide depth
+
+    def set_timer(self, time_limit, start_time):
+        self.time_limit = time_limit
+        self.start_time = start_time
 
 
     """
@@ -43,10 +47,9 @@ class AlphaBeta(OthelloAlgorithm):
 
    
     def evaluate_max(self, position, depth, alpha, beta):
-        max_value = self.NegInfty
+        max_value = float('-inf')
         moves = position.get_moves()
-
-        if depth == 0:
+        if depth == 0 or ((time.time() - self.start_time) > self.time_limit):
             action = OthelloAction(0, 0)
             action.value = self.evaluator.evaluate(position)
             return action
@@ -74,10 +77,11 @@ class AlphaBeta(OthelloAlgorithm):
         return best_action
 
     def evaluate_min(self, position, depth, alpha, beta):
-        min_value = self.PosInfty
+        min_value = float('inf')
         moves = position.get_moves()
 
-        if depth == 0:
+
+        if depth == 0 or ((time.time() - self.start_time) > self.time_limit):
             action = OthelloAction(0, 0)
             action.value = self.evaluator.evaluate(position)
             return action

@@ -106,17 +106,37 @@ class OthelloPosition(object):
 
     def get_moves(self):
         """
-        Get all possible moves for the current position
-        :return: A list of OthelloAction representing all possible moves in the position. If the
-        list is empty, there are no legal moves for the player who has the move.
+        Get all possible moves for the current position, sorted by the desirability
+        of the move (e.g., corners are favored, edges less so, etc.).
+        :return: A list of OthelloAction representing all possible moves in the position,
+        sorted with favored moves first.
         """
         moves = []
+        favored_positions = [
+            [10, -2,  4,  4,  4,  4, -2, 10],  # row 1 (corners + edges)
+            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 2 (adjacent to corners, bad)
+            [ 4, -1,  3,  2,  2,  3, -1,  4],  # row 3 (inner squares)
+            [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 4 (middle area)
+            [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 5 (middle area)
+            [ 4, -1,  3,  2,  2,  3, -1,  4],  # row 6 (inner squares)
+            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 7 (adjacent to corners, bad)
+            [10, -2,  4,  4,  4,  4, -2, 10]   # row 8 (corners + edges)
+        ]
+
         append = moves.append
         for i in range(self.BOARD_SIZE):
             for j in range(self.BOARD_SIZE):
                 if self.__is_candidate(i + 1, j + 1) and self.__is_move(i + 1, j + 1):
-                    append(OthelloAction(i + 1, j + 1))
-        return moves
+                    # Calculate the score of the move based on its board position
+                    score = favored_positions[i][j]
+                    append((score, OthelloAction(i + 1, j + 1)))
+
+        # Sort moves by score, with highest (favored) moves appearing first
+        moves.sort(reverse=True, key=lambda x: x[0])
+
+        # Return only the list of actions, not the scores
+        return [move for score, move in moves]
+
 
     def __is_candidate(self, row, col):
         """
