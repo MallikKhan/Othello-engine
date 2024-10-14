@@ -25,6 +25,7 @@ class OthelloPosition(object):
         self.BOARD_SIZE = 8
         self.maxPlayer = True
         self.board = np.array([['E' for col in range(self.BOARD_SIZE + 2)] for row in range(self.BOARD_SIZE + 2)])
+        
         if len(list(board_str)) >= 65:
             if board_str[0] == 'W':
                 self.maxPlayer = True
@@ -57,47 +58,34 @@ class OthelloPosition(object):
         :param action: The move to make as an OthelloAction
         :return: The OthelloPosition resulting from making the move action in the current position.
         """
-        # TODO: write the code for this method and whatever helper methods it need
         ret = self.clone()
-        if action.is_pass_move:
-            ret.maxPlayer = not self.maxPlayer
-        elif self.maxPlayer:
-            ret.board[action.row][action.col] = 'W'
-            ret.maxPlayer = False
-            ret.flip_stones(action, 'W')
-        else:
-            ret.board[action.row][action.col] = 'B'
-            ret.maxPlayer = True
-            ret.flip_stones(action, 'B')
-
+        if not action.is_pass_move:
+            player_piece = 'W' if self.maxPlayer else 'B'
+            ret.board[action.row, action.col] = player_piece
+            ret.flip_stones(action, player_piece)
+        ret.maxPlayer = not self.maxPlayer
         return ret
-    
-    def flip(self, action):
-        if self.board[action.row][action.col] == 'W':
-            self.board[action.row][action.col] = 'B'
-        else:
-            self.board[action.row][action.col] = 'W'
+
 
 
     def flip_stones(self, action, player):
         opponent = 'W' if player == 'B' else 'B'
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1),  # Up, Down, Left, Right
-                      (-1, -1), (-1, 1), (1, -1), (1, 1)]  # Diagonals
-
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # All directions
+        
         for direction in directions:
             row, col = action.row + direction[0], action.col + direction[1]
-            stones_to_flip = []
+            positions_to_flip = []
 
-            while self.is_inbound(row, col) and self.board[row][col] == opponent:
-                stones_to_flip.append(OthelloAction(row, col))
+            while self.is_inbound(row, col) and self.board[row, col] == opponent:
+                positions_to_flip.append((row, col))
                 row += direction[0]
                 col += direction[1]
 
-            # If we find a player's own stone after opponent's stones, we can flip them
-            if self.is_inbound(row, col) and self.board[row][col] == player:
-                if len(stones_to_flip) > 0:
-                    for a in stones_to_flip:
-                        self.flip(a)
+            if self.is_inbound(row, col) and self.board[row, col] == player and positions_to_flip:
+                pos = np.array(positions_to_flip)
+                self.board[pos[:, 0], pos[:, 1]] = player
+
+
         
     
     def is_inbound(self, row, col):
