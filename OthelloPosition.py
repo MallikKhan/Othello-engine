@@ -26,6 +26,7 @@ class OthelloPosition(object):
         self.maxPlayer = True
         self.board = np.array([['E' for col in range(self.BOARD_SIZE + 2)] for row in range(self.BOARD_SIZE + 2)])
         
+        
         if len(list(board_str)) >= 65:
             if board_str[0] == 'W':
                 self.maxPlayer = True
@@ -64,7 +65,13 @@ class OthelloPosition(object):
             ret.board[action.row, action.col] = player_piece
             ret.flip_stones(action, player_piece)
         ret.maxPlayer = not self.maxPlayer
+        if not action.is_pass_move:
+            player_piece = 'W' if self.maxPlayer else 'B'
+            ret.board[action.row, action.col] = player_piece
+            ret.flip_stones(action, player_piece)
+        ret.maxPlayer = not self.maxPlayer
         return ret
+
 
 
 
@@ -74,6 +81,7 @@ class OthelloPosition(object):
         
         for direction in directions:
             row, col = action.row + direction[0], action.col + direction[1]
+            positions_to_flip = []
             positions_to_flip = []
 
             while self.is_inbound(row, col) and self.board[row, col] == opponent:
@@ -100,30 +108,12 @@ class OthelloPosition(object):
         sorted with favored moves first.
         """
         moves = []
-        favored_positions = [
-            [10, -2,  4,  4,  4,  4, -2, 10],  # row 1 (corners + edges)
-            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 2 (adjacent to corners, bad)
-            [ 4, -1,  3,  2,  2,  3, -1,  4],  # row 3 (inner squares)
-            [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 4 (middle area)
-            [ 4, -1,  2,  1,  1,  2, -1,  4],  # row 5 (middle area)
-            [ 4, -1,  3,  2,  2,  3, -1,  4],  # row 6 (inner squares)
-            [-2, -5, -1, -1, -1, -1, -5, -2],  # row 7 (adjacent to corners, bad)
-            [10, -2,  4,  4,  4,  4, -2, 10]   # row 8 (corners + edges)
-        ]
-
         append = moves.append
         for i in range(self.BOARD_SIZE):
             for j in range(self.BOARD_SIZE):
                 if self.__is_candidate(i + 1, j + 1) and self.__is_move(i + 1, j + 1):
-                    # Calculate the score of the move based on its board position
-                    score = favored_positions[i][j]
-                    append((score, OthelloAction(i + 1, j + 1)))
-
-        # Sort moves by score, with highest (favored) moves appearing first
-        moves.sort(reverse=True, key=lambda x: x[0])
-
-        # Return only the list of actions, not the scores
-        return [move for score, move in moves]
+                    append((OthelloAction(i + 1, j + 1)))
+        return moves
 
 
     def __is_candidate(self, row, col):
