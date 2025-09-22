@@ -1,0 +1,6 @@
+***************************************
+Results for ./othello_naive vs. ../../../Othello-engine/othello.sh:
+White won with 19 points
+Average time for white: 0.4 s (max: 1 s)
+Average time for black: 3.6 s (max: 4 s)
+***************************************

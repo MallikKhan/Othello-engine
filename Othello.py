@@ -28,6 +28,7 @@ def main(position, time_limit):
     best_action = OthelloAction(1, 1)  # Initialize the best action
     i = 1  # Start with a search depth of 1
     ab_pruning = AlphaBeta(RankedEvaluator())
+    start_time = time.time()
     ab_pruning.set_timer(time_limit, start_time)
 
     # Iterative deepening search
