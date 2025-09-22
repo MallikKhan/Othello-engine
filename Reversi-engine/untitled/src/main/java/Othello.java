@@ -10,11 +10,11 @@ public class Othello {
             position.initialize();
         }
 
-        AlphaBeta alphaBeta = new AlphaBeta(new RankedEvaluator());
+        AlphaBeta alphaBeta = new AlphaBeta(new EdaxStyleEvaluator());
         OthelloAction bestMove = new OthelloAction(0, 0);
         OthelloAction previousMove = new OthelloAction(0, 0);
         alphaBeta.setTime(timeLimit, System.currentTimeMillis());
-        int depth = 9;
+        int depth = 7;
         int repeats = 0;
         long startTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - startTime) < timeLimit && repeats < 15) {

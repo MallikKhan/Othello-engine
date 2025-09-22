@@ -4,7 +4,7 @@ import java.util.ListIterator;
 /**
  * This is where you implement the alpha-beta algorithm.
  * See <code>OthelloAlgorithm</code> for details
- * 
+ *
  * @author Henrik Bj&ouml;rklund
  *
  */
@@ -50,86 +50,78 @@ public class AlphaBeta implements OthelloAlgorithm {
 		return pos.toMove() ? this.max(pos, this.searchDepth, NegInfty, PosInfty) : this.min(pos, this.searchDepth, NegInfty, PosInfty);
 	}
 
-	private OthelloAction max(OthelloPosition position, int depth, int alpha, int beta){
-		int minValue = NegInfty;
+	private OthelloAction max(OthelloPosition position, int depth, int alpha, int beta) {
+		int bestValue = NegInfty;
 		LinkedList<OthelloAction> moves = position.getMoves();
-		ListIterator<OthelloAction> movesIterator = moves.listIterator();
-		OthelloAction move;
 
-		if (depth == 0) {
-			move = new OthelloAction(0, 0);
-			move.value = this.evaluator.evaluate(position);
-		} else if (!movesIterator.hasNext()) {
-			move = new OthelloAction(0, 0, true);
-			move.value = this.evaluator.evaluate(position);
-		} else {
-			OthelloAction maximizingMove = new OthelloAction(0, 0);
-
-			
-			while (movesIterator.hasNext()){
-				move = movesIterator.next();
-				OthelloPosition nextPosition = position.makeMove(move);
-				OthelloAction minimizingMove = this.min(nextPosition, depth-1, alpha, beta);
-				
-				if (minValue < minimizingMove.value) {
-					move.value = minValue = minimizingMove.value;
-					maximizingMove = move;
-				}
-				
-				if (minValue >= beta) {
-					move.value = minValue;
-					return move;
-				}
-				
-				if (minValue > alpha){
-					alpha = minValue;
-				}
-			}
-			
-			return maximizingMove;
+		// Leaf or terminal node
+		if (depth == 0 || moves.isEmpty()) {
+			OthelloAction leaf = new OthelloAction(-1, -1, true); // -1,-1 = dummy "evaluation-only"
+			leaf.value = evaluator.evaluate(position);
+			return leaf;
 		}
-		return move;
-	}
 
-	private OthelloAction min(OthelloPosition position, int depth, int alpha, int beta){
-		int maxValue = PosInfty;
-		LinkedList<OthelloAction> moves = position.getMoves();
-		ListIterator<OthelloAction> movesIterator = moves.listIterator();
-		OthelloAction move;
-		if (depth == 0) {
-			move = new OthelloAction(0, 0);
-			move.value = this.evaluator.evaluate(position);
-		} else if (!movesIterator.hasNext()) {
-			move = new OthelloAction(0, 0, true);
-			move.value = this.evaluator.evaluate(position);
-		} else {
-			OthelloAction minimizingMove = new OthelloAction(0, 0);
-			moves = position.getMoves();
-			movesIterator = moves.listIterator();
+		OthelloAction bestMove = null;
 
-			while (movesIterator.hasNext() && System.currentTimeMillis() - startTime < timeLimit){
-				move = movesIterator.next();
-				OthelloPosition nextPosition = position.makeMove(move);
-				OthelloAction maximizingMove = this.max(nextPosition, depth-1, alpha, beta);
-
-				if (maxValue > maximizingMove.value) {
-					move.value = maxValue = maximizingMove.value;
-					minimizingMove = move;
-				}
-
-				if (maxValue <= alpha) {
-					move.value = maxValue;
-					return move;
-				}
-
-				if (maxValue < beta) {
-					beta = maxValue;
-				}
+		for (OthelloAction move : moves) {
+			if (System.currentTimeMillis() - startTime >= timeLimit) {
+				// Time limit reached → return best so far (or fallback to first move)
+				return (bestMove != null) ? bestMove : move;
 			}
 
-			return minimizingMove;
+			OthelloPosition nextPosition = position.makeMove(move);
+			OthelloAction reply = min(nextPosition, depth - 1, alpha, beta);
+
+			if (reply.value > bestValue) {
+				bestValue = reply.value;
+				bestMove = new OthelloAction(move.getRow(), move.getColumn());
+				bestMove.value = bestValue;
+			}
+
+			alpha = Math.max(alpha, bestValue);
+			if (alpha >= beta) {
+				break; // Beta cutoff
+			}
 		}
-		
-		return move;
+
+		return bestMove;
 	}
+
+	private OthelloAction min(OthelloPosition position, int depth, int alpha, int beta) {
+		int bestValue = PosInfty;
+		LinkedList<OthelloAction> moves = position.getMoves();
+
+		// Leaf or terminal node
+		if (depth == 0 || moves.isEmpty()) {
+			OthelloAction leaf = new OthelloAction(-1, -1, true);
+			leaf.value = evaluator.evaluate(position);
+			return leaf;
+		}
+
+		OthelloAction bestMove = null;
+
+		for (OthelloAction move : moves) {
+			if (System.currentTimeMillis() - startTime >= timeLimit) {
+				// Time limit reached → return best so far (or fallback to first move)
+				return (bestMove != null) ? bestMove : move;
+			}
+
+			OthelloPosition nextPosition = position.makeMove(move);
+			OthelloAction reply = max(nextPosition, depth - 1, alpha, beta);
+
+			if (reply.value < bestValue) {
+				bestValue = reply.value;
+				bestMove = new OthelloAction(move.getRow(), move.getColumn());
+				bestMove.value = bestValue;
+			}
+
+			beta = Math.min(beta, bestValue);
+			if (beta <= alpha) {
+				break; // Alpha cutoff
+			}
+		}
+
+		return bestMove;
+	}
+
 }
