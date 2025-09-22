@@ -322,6 +322,9 @@ class OthelloPosition(object):
             return True
         return False
 
+    def is_opponent_square(self, row, col):
+        return self.__is_opponent_square( row, col)
+
     def __is_own_square(self, row, col):
         """
         Check if the position is occupied by the player
@@ -334,6 +337,9 @@ class OthelloPosition(object):
         if self.maxPlayer and self.board[row][col] == 'W':
             return True
         return False
+
+    def is_own_square(self, row, col):
+        return self.__is_own_square(row,col)
 
     def __has_neighbour(self, row, col):
         """
